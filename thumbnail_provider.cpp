@@ -3,6 +3,7 @@
 #include <shellapi.h>
 #include <shlobj_core.h>
 #include <shlwapi.h>
+#include <string>
 #include <strsafe.h>
 #include <thumbcache.h>
 #include <vector>
@@ -17,17 +18,21 @@
 #pragma comment(lib, "user32.lib")
 
 // Change it to your own extension.
-#define FILE_EXTENSION ".myextension"
-#define FILE_EXTENSIONW L".myextension"
+#define FILE_EXTENSION ".plasticity"
+#define FILE_EXTENSIONW L".plasticity"
 
 // Generate new UUID with `uuidgen -c` command in the terminal.
-#define THUMBNAIL_HANDLER_GUID L"{972F8C22-1444-4075-A830-E7BA46C13FE9}"
+#define THUMBNAIL_HANDLER_GUID L"{6C68F6DE-04B0-4524-8276-106DB61B06B7}"
 
 #define CLSID_THUMBNAIL_HANDLER_GUID L"{E357FCCD-A995-4576-B01F-234630154E96}"
 
+const uint32_t JSON_MAGIC = 0x4e4f534a;
+const uint32_t BIN_MAGIC = 0x004e4942;
+const uint32_t THMB_MAGIC = 0x424d4854;
+
 HMODULE g_hModule;
 
-class __declspec(uuid("972F8C22-1444-4075-A830-E7BA46C13FE9")) ThumbnailProvider :
+class __declspec(uuid("6C68F6DE-04B0-4524-8276-106DB61B06B7")) ThumbnailProvider :
   public IInitializeWithFile,
   public IInitializeWithStream,
   public IThumbnailProvider {
@@ -76,8 +81,56 @@ public:
   }
 
   std::vector<BYTE> ParseThumbNailFromFileData(const std::vector<BYTE>& fileData) {
-    // Custom logic to extract thumbnail from file data as PNG.
+    size_t offset = 0;
 
+    std::string magic(fileData.begin(), fileData.begin() + 10);
+    if (magic != FILE_EXTENSION) {
+        return std::vector<BYTE>();
+    }
+    offset += 10;
+
+    uint32_t version = *reinterpret_cast<const uint32_t*>(&fileData[offset]);
+    if (version != 1) {
+        return std::vector<BYTE>();
+    }
+    offset += 4;
+
+    uint32_t length = *reinterpret_cast<const uint32_t*>(&fileData[offset]);
+    if (fileData.size() < length) {
+        return std::vector<BYTE>();
+    }
+    offset += 4;
+
+    {
+      uint32_t jsonLength = *reinterpret_cast<const uint32_t*>(&fileData[offset]);
+      offset += 4;
+      uint32_t magic = *reinterpret_cast<const uint32_t*>(&fileData[offset]);
+      if (magic != JSON_MAGIC) {
+        return std::vector<BYTE>();
+      }
+      offset += 4;
+      offset += jsonLength;
+    }
+
+    {
+      uint32_t binLength = *reinterpret_cast<const uint32_t*>(&fileData[offset]);
+      offset += 4;
+      uint32_t magic = *reinterpret_cast<const uint32_t*>(&fileData[offset]);
+      if (magic != BIN_MAGIC) {
+        return std::vector<BYTE>();
+      }
+      offset += 4;
+      offset += binLength;
+    }
+
+    if (offset < fileData.size()) {
+      uint32_t thumbLength = *reinterpret_cast<const uint32_t*>(&fileData[offset]);
+      offset += 4;
+      uint32_t magic = *reinterpret_cast<const uint32_t*>(&fileData[offset]);
+      if (magic != THMB_MAGIC) return std::vector<BYTE>();
+      offset += 4;
+      return std::vector<BYTE>(fileData.begin() + offset, fileData.begin() + offset + thumbLength);
+    }
     return std::vector<BYTE>();
   }
 

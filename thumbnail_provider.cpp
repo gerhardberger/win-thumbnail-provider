@@ -20,9 +20,11 @@
 #define FILE_EXTENSION ".myextension"
 #define FILE_EXTENSIONW L".myextension"
 
-// Generate new UUIDs with `uuidgen -c` command in the terminal.
+// Generate new UUID with `uuidgen -c` command in the terminal.
 #define THUMBNAIL_HANDLER_GUID L"{972F8C22-1444-4075-A830-E7BA46C13FE9}"
-#define CLSID_THUMBNAIL_HANDLER_GUID L"{516454EB-CD05-4E97-BBFB-CC9C24E21434}"
+
+#define CLSID_THUMBNAIL_HANDLER_GUID L"{E357FCCD-A995-4576-B01F-234630154E96}"
+
 
 HMODULE g_hModule;
 

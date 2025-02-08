@@ -7,11 +7,13 @@ files with a specified extension.
 
 1. Clone the repository, or copy the `thumbnail_provider.cpp` and\
 `thumbnail_provider.def` file into your project.
-2. Compile the `thumbnail_provider.dll` using `npm run build`. Note: Make sure
+2. Generate new `THUMBNAIL_HANDLER_GUID` for your extension using `uuidgen -c`
+in the command line.
+3. Compile the `thumbnail_provider.dll` using `npm run build`. Note: Make sure
 to compile your DLL for the correct environment, e.g. x64 as that can be a
 problem when registering.
-3. Ship `thumbnail_provider.dll` with your app or installer.
-4. Register it with the following command (important to use the absolute path to the DLL):
+4. Ship `thumbnail_provider.dll` with your app or installer.
+5. Register it with the following command (important to use the absolute path to the DLL):
 
 ``` bash
 $ regsvr32 /absolute/path/to/thumbnail_provider.dll`

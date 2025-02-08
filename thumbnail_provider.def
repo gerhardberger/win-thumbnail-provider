@@ -1,0 +1,7 @@
+LIBRARY thumbnail_provider
+EXPORTS
+    DllRegisterServer PRIVATE
+    DllUnregisterServer PRIVATE
+    DllGetClassObject PRIVATE
+    DllCanUnloadNow PRIVATE
+    DllMain PRIVATE

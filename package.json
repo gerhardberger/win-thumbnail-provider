@@ -1,0 +1,12 @@
+{
+  "name": "win-thumbnail-provider",
+  "version": "1.0.0",
+  "description": "A DLL shell extension that when registered can generate custom thumbnails for files with a specified extension.",
+  "main": "index.js",
+  "scripts": {
+    "build": "cl /LD /MD thumbnail_provider.cpp /link /DLL /DEF:thumbnail_provider.def"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}
